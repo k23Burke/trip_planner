@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %} Browse My Stuff{% endblock %}
+
+
+
+{% block content %}
+<h1>Hotels</h1>
+
+	  	{% if hotels.length > 0 %}
+	  		<select name="hotel" id="possHotel">
+	    		{% for hotel in hotels %}
+		    		<option value="{{ hotel.name }}">{{ hotel.name }}</option>
+	    		{% endfor %}
+	  		</select>
+	  		<button id="hotelSelector" class="btn btn-circle">+</button>
+		{% endif %}
+
+
+<h1>Restaurant</h1>
+
+	  	{% if restaurants.length > 0 %}
+	  		<select name="restaurant" id= "possRest">
+	    		{% for restaurant in restaurants %}
+		    		<option value="{{ restaurant.name }}">{{ restaurant.name }}</option>
+	    		{% endfor %}
+	  		</select>
+	  		<button id="restaurantSelector" class="btn btn-circle">+</button>
+		{% endif %}
+
+<h1>Things to Do</h1>
+
+	  	{% if things.length > 0 %}
+	  		<select name="thing" id="possThing">
+	    		{% for thing in things %}
+		    		<option value="{{ thing.name }}">{{ thing.name }}</option>
+	    		{% endfor %}
+	  		</select>
+	  		<button id="thingSelector" class="btn btn-circle">+</button>
+		{% endif %}
+
+{% endblock %}
+

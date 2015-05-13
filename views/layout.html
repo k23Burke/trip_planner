@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}Wikistack{% endblock %}</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.svg">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAz_8HLHQjbQHik4mIbUwf0EeMmKx2JFJg&sensor=true"></script>
+  </head>
+  <body>
+  <div>
+    <nav id="navigation" class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+          <ul class="nav navbar-nav">
+          <li><a href="/">Home</a></li>
+          <!-- <form method="GET" action="/search"> -->
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <div id="map">
+  </div>
+  <div id="sidebar">
+  </div>
+  <div id="sidebar-ontop">
+    <div id="item-selector">
+      {% block content %}
+      {% endblock %}
+    </div>
+    <div id="day-selector" class="panel panel-default">
+      <h1>Day</h1>
+      <div id="list-days" class="panel-heading">
+        <button id="active-day" class="btn btn-circle day-clicker">1</button>
+        <button id="addDay" class="btn btn-circle">+</button>
+      </div>
+      <div id="the-day" class="panel-body">
+        <div id="day-1">
+          <h3>Hotel</h3>
+          <ul class="hotelForDay">
+          </ul>
+          <h3>Restaurant</h3>
+          <ul class="restForDay">
+          </ul>
+          <h3>Things to Do</h3>
+          <ul class="thingsForDay">
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </body>
+  <script src="/bower_components/jquery/dist/jquery.js"></script>
+  <script src="/javascripts/main.js"></script>
+  <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+</html>

@@ -1,8 +1,69 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
+  padding: 0px;
+  padding-top: 50px; }
 
 a {
-  color: #00B7FF;
-}
+  color: #00B7FF; }
+
+* {
+  box-sizing: border-box; }
+
+#sidebar {
+  width: 30%;
+  background-color: #3f3f3f;
+  position: absolute;
+  z-index: 1;
+  opacity: 0.5;
+  top: 50px;
+  left: 70%;
+  padding: 10px;
+  height: 700px;
+  border-radius: 6px; }
+
+#sidebar-ontop {
+  position: absolute;
+  z-index: 2;
+  top: 50px;
+  left: 70%;
+  padding: 10px;
+  width: 30%; }
+
+#item-selector {
+  background-color: orange;
+  margin-bottom: 30px;
+  border-radius: 6px;
+  opacity: 0.95;
+  padding: 10px; }
+  #item-selector h1 {
+    font-size: 14px;
+    font-weight: bold; }
+
+#day-selector {
+  border-radius: 6px;
+  opacity: 0.95;
+  color: #333; }
+  #day-selector h1 {
+    margin: 5px 0 0 10px; }
+  #day-selector #list-days {
+    background-color: grey;
+    padding: 10px; }
+  #day-selector #the-day {
+    height: 321px;
+    overflow-y: scroll;
+    padding: 10px; }
+    #day-selector #the-day h3 {
+      margin-top: 0px; }
+    #day-selector #the-day li {
+      list-style: none; }
+
+#active-day {
+  background-color: #777; }
+
+#map {
+  width: 100%;
+  background-color: #dfdfdf;
+  height: 700px; }
+
+button.btn-circle {
+  border-radius: 50%; }
