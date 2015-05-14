@@ -75,8 +75,11 @@ $(document).ready(function() {
         if(dayArray[day-1].hotel === null) {
             var hName = $('#possHotel').val();
             var elem = $('#day-'+day).find(".hotelForDay");
-            elem.append('<li>'+hName+'</li>');
+            elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
             dayArray[day-1].hotel = hName;
+            all_hotels.forEach(function(hotel) {
+                if(hotel.name === hName) console.log(hotel.place[0].location)
+            })
         } else {
             alert('You already booked a Hotel');
         }
@@ -89,7 +92,7 @@ $(document).ready(function() {
             
             if(dayArray[day-1].rest.indexOf(hName) === -1 ){
                 var elem = $('#day-'+day).find(".restForDay");
-                elem.append('<li>'+hName+'</li>');
+                elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
                 dayArray[day-1].rest.push(hName); 
             }else{
                 alert(hName+' is good, but not that good!')
@@ -107,7 +110,7 @@ $(document).ready(function() {
             if(dayArray[day-1].thing.indexOf(hName) === -1 ){
 
                 var elem = $('#day-'+day).find(".thingsForDay");
-                elem.append('<li>'+hName+'</li>');
+                elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
                 dayArray[day-1].thing.push(hName);
             }else{
                 alert('You\'re boring!');
@@ -146,6 +149,41 @@ $(document).ready(function() {
         }
 
     })
+
+    $('#the-day').on('click', '.removeItem', function() {
+        var value = $(this).parent().text()
+        value = value.slice(0, -1);
+        // console.log(value)
+        // remove item from day obj
+        //get dayid
+        // $('#day-1').parent();
+        var id = $(this).parent().parent().parent('div').attr('id');
+        console.log(id);
+        id = parseInt(id.slice(-1));
+        if($(this).parent().parent('ul').hasClass('hotelForDay')) {
+            dayArray[id-1].hotel = null;
+        } else if ($(this).parent().parent('ul').hasClass('restForDay')) {
+            var index;
+            dayArray[id-1].rest.forEach(function(restaurant) {
+                if(value === restaurant) {
+                    index = dayArray[id-1].rest.indexOf(restaurant);
+                }
+            })
+            dayArray[id-1].rest.splice(index, 1);
+            console.log(dayArray)
+        } else if ($(this).parent().parent('ul').hasClass('thingsForDay')) {
+            var index;
+            dayArray[id-1].thing.forEach(function(thing) {
+                if(value === thing) {
+                    index = dayArray[id-1].thing.indexOf(thing);
+                }
+            })
+            dayArray[id-1].thing.splice(index, 1);
+            console.log(dayArray)
+        }
+        // remove item from DOM
+        $(this).parent().remove()
+    });
 
     $('#list-days').delegate(".day-clicker", "click", function() {
         //use this to get the day to change to

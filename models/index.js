@@ -17,7 +17,7 @@ var PlaceSchema = new Schema({
 
 var HotelSchema = new Schema({
 	name: String,
-	place: String,
+	place: [PlaceSchema],
 	num_stars: {type: Number, min: 1, max: 5},
 	amenities: String //(comma delimited string list)
 })
@@ -27,13 +27,13 @@ HotelSchema.statics.delimiter = function(str){
 
 var ThingToDoSchema = new Schema({
 	name: String,
-	place: String,
+	place: [PlaceSchema],
 	age_range: String// (data-type string)
 })
 
 var RestaurantSchema =  new Schema({
 	name: String,
-	place: String,
+	place: [PlaceSchema],
 	cuisine: String,// (comma delimited string list)
 	price: {type: Number, min:1, max:5}// (integer from 1-5 for how many dollar signs)
 })
