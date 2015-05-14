@@ -68,7 +68,40 @@ $(document).ready(function() {
                 icon: ttdimg
             })
     }
-                
+
+    var bounds = new google.maps.LatLngBounds();
+    function newBounds(newlatlng) {
+        bounds.extend(newlatlng);
+        map.fitBounds(bounds);
+    }
+
+    function removePossMarkers() {
+        possObj.hotelMark.setMap(null)
+        possObj.restMark.setMap(null)
+        possObj.thingMark.setMap(null)
+    }
+
+    function removeAllMarkersExceptDay(daynum) {
+        dayArray.forEach(function(day) {
+            if((daynum - 1) !== dayArray.indexOf(day)) {
+                day.hotelMark.setMap(null);
+                day.restMark.forEach(function(restMarker) {
+                    restMarker.setMap(null)
+                })
+                day.thingMark.forEach(function(thingMarker) {
+                    thingMarker.setMap(null)
+                })
+            } else {
+                day.hotelMark.setMap(map);
+                day.restMark.forEach(function(restMarker) {
+                    restMarker.setMap(map)
+                })
+                day.thingMark.forEach(function(thingMarker) {
+                    thingMarker.setMap(map)
+                })
+            }
+        })
+    }
 
     //initializing trip days
     function tripObj(){
@@ -116,7 +149,8 @@ $(document).ready(function() {
 
     $('#hotelSelector').click(function(){
         var day = findActiveDay();
-        if(dayArray[day-1].hotel === null) {
+        var hName = $('#possHotel').val();
+        if(dayArray[day-1].hotel === null && hName !== "") {
             var hName = $('#possHotel').val();
             var elem = $('#day-'+day).find(".hotelForDay");
             elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
@@ -136,6 +170,7 @@ $(document).ready(function() {
 
             //set selected hotel marker
             dayArray[day-1].hotelMark.position = new google.maps.LatLng(lat,lon);
+            newBounds(dayArray[day-1].hotelMark.position);
             dayArray[day-1].hotelMark.title = hName;
             console.log(dayArray[day-1].hotelMark)
             dayArray[day-1].hotelMark.setMap(map);
@@ -156,8 +191,9 @@ $(document).ready(function() {
 
     $('#restaurantSelector').click(function(){
         var day = findActiveDay();
-        if(dayArray[day-1].rest.length < 3) {
-            var hName = $('#possRest').val();
+        var hName = $('#possRest').val();
+        if(dayArray[day-1].rest.length < 3 && hName !== "") {
+            
             
             if(dayArray[day-1].rest.indexOf(hName) === -1 ){
                 var elem = $('#day-'+day).find(".restForDay");
@@ -176,6 +212,8 @@ $(document).ready(function() {
                 possObj.restMark.setMap(null);
                 var newMark = restMarker();
                 newMark.position = new google.maps.LatLng(lat,lon);
+                newBounds(newMark.position);
+
                 newMark.title = hName;
                 newMark.setMap(map);
                 dayArray[day-1].restMark.push(newMark);
@@ -197,8 +235,9 @@ $(document).ready(function() {
 
     $('#thingSelector').click(function(){
         var day = findActiveDay();
-        if(dayArray[day-1].thing.length < 4) {
-            var hName = $('#possThing').val();
+        var hName = $('#possThing').val();
+        if(dayArray[day-1].thing.length < 4 && hName !== "") {
+            
             
             if(dayArray[day-1].thing.indexOf(hName) === -1 ){
 
@@ -219,6 +258,7 @@ $(document).ready(function() {
                 possObj.thingMark.setMap(null);
                 var newMark = thingMarker();
                 newMark.position = new google.maps.LatLng(lat,lon);
+                newBounds(newMark.position);
                 newMark.title = hName;
                 newMark.setMap(map);
                 dayArray[day-1].thingMark.push(newMark);
@@ -239,8 +279,10 @@ $(document).ready(function() {
     })
     $('#addDay').click(function(){
         if(dayArray.length < 7){
+            removePossMarkers();
             createADay();
             var day = findActiveDay();
+            removeAllMarkersExceptDay(dayArray.length)
             $('#day-number').text(dayArray.length);
 
             //create the new day button
@@ -269,6 +311,7 @@ $(document).ready(function() {
     })
 
     $('#the-day').on('click', '.removeItem', function() {
+        removePossMarkers();
         var value = $(this).parent().text()
         value = value.slice(0, -1);
         // console.log(value)
@@ -309,6 +352,7 @@ $(document).ready(function() {
     $('#list-days').delegate(".day-clicker", "click", function() {
         //use this to get the day to change to
         var day = parseInt($(this).text());
+        removeAllMarkersExceptDay(day)
         if(day < dayArray.length) {
             $('#remove-day').css('display','none');
         } else if(day === dayArray.length) {
@@ -368,6 +412,7 @@ $(document).ready(function() {
             }
         });
         possObj.hotelMark.position = new google.maps.LatLng(lat, lon);
+        newBounds(possObj.hotelMark.position);
         possObj.hotelMark.title= hotName;
         possObj.hotelMark.setMap(map);
 
@@ -383,6 +428,7 @@ $(document).ready(function() {
             }
         });
         possObj.restMark.position = new google.maps.LatLng(lat, lon);
+        newBounds(possObj.restMark.position);
         possObj.restMark.title = restName;
         possObj.restMark.setMap(map);
     })
@@ -397,6 +443,7 @@ $(document).ready(function() {
             }
         });  
         possObj.thingMark.position = new google.maps.LatLng(lat, lon);
+        newBounds(possObj.thingMark.position);
         possObj.thingMark.title = thingName;
         possObj.thingMark.setMap(map);
     })
