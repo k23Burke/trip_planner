@@ -57,6 +57,9 @@ a {
     #day-selector #the-day li {
       list-style: none; }
 
+#remove-day {
+  display: none; }
+
 #active-day {
   background-color: #777; }
 

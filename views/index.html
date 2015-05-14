@@ -8,6 +8,7 @@
 
 	  	{% if hotels.length > 0 %}
 	  		<select name="hotel" id="possHotel">
+	  				<option value="">--</option>
 	    		{% for hotel in hotels %}
 		    		<option value="{{ hotel.name }}">{{ hotel.name }}</option>
 	    		{% endfor %}
@@ -20,6 +21,7 @@
 
 	  	{% if restaurants.length > 0 %}
 	  		<select name="restaurant" id= "possRest">
+	  				<option value="">--</option>
 	    		{% for restaurant in restaurants %}
 		    		<option value="{{ restaurant.name }}">{{ restaurant.name }}</option>
 	    		{% endfor %}
@@ -29,9 +31,10 @@
 
 <h1>Things to Do</h1>
 
-	  	{% if things.length > 0 %}
+	  	{% if things_to_do.length > 0 %}
 	  		<select name="thing" id="possThing">
-	    		{% for thing in things %}
+	  				<option value="">--</option>
+	    		{% for thing in things_to_do %}
 		    		<option value="{{ thing.name }}">{{ thing.name }}</option>
 	    		{% endfor %}
 	  		</select>

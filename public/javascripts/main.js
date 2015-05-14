@@ -11,33 +11,34 @@ function initialize_gmaps() {
     var map_canvas_obj = document.getElementById("map");
     // initialize a new Google Map with the options
     var map = new google.maps.Map(map_canvas_obj, mapOptions);
+    return map;
     // Add the marker to the map
-    var htlimg = 'http://static.iconsplace.com/icons/preview/black/hotel-32.png';
-    var rstimg = 'http://static.iconsplace.com/icons/preview/black/restaurant-32.png';
-    var ttdimg = 'http://static.iconsplace.com/icons/preview/black/museum-32.png';
+    // var htlimg = 'http://static.iconsplace.com/icons/preview/black/hotel-32.png';
+    // var rstimg = 'http://static.iconsplace.com/icons/preview/black/restaurant-32.png';
+    // var ttdimg = 'http://static.iconsplace.com/icons/preview/black/museum-32.png';
 
-    var hLatLng = new google.maps.LatLng(40.707119, -74.003602);
-    var hmarker = new google.maps.Marker({
-        position: hLatLng,
-        title:"Hotel",
-        icon: htlimg
-    });
-    var rLatLng = new google.maps.LatLng(40.71919, -74.003602);
-    var rmarker = new google.maps.Marker({
-        position: rLatLng,
-        title:"Restaurant",
-        icon: rstimg
-    });
-    var tLatLng = new google.maps.LatLng(40.718679, -74.008900);
-    var tmarker = new google.maps.Marker({
-        position: tLatLng,
-        title:"Things",
-        icon: ttdimg
-    });
-    // Add the marker to the map by calling setMap()
-    hmarker.setMap(map);
-    rmarker.setMap(map);
-    tmarker.setMap(map);
+    // var hLatLng = new google.maps.LatLng(40.707119, -74.003602);
+    // var hmarker = new google.maps.Marker({
+    //     position: hLatLng,
+    //     title:"Hotel",
+    //     icon: htlimg
+    // });
+    // var rLatLng = new google.maps.LatLng(40.71919, -74.003602);
+    // var rmarker = new google.maps.Marker({
+    //     position: rLatLng,
+    //     title:"Restaurant",
+    //     icon: rstimg
+    // });
+    // var tLatLng = new google.maps.LatLng(40.718679, -74.008900);
+    // var tmarker = new google.maps.Marker({
+    //     position: tLatLng,
+    //     title:"Things",
+    //     icon: ttdimg
+    // });
+    // // Add the marker to the map by calling setMap()
+    // hmarker.setMap(map);
+    // rmarker.setMap(map);
+    // tmarker.setMap(map);
 }
 
 
@@ -46,15 +47,58 @@ function initialize_gmaps() {
 
 
 $(document).ready(function() {
-    initialize_gmaps();
+    var map = initialize_gmaps();
+
+    var htlimg = 'http://static.iconsplace.com/icons/preview/black/hotel-32.png';
+    var rstimg = 'http://static.iconsplace.com/icons/preview/black/restaurant-32.png';
+    var ttdimg = 'http://static.iconsplace.com/icons/preview/black/museum-32.png';
+
+    var restMarker = function() { 
+        return new google.maps.Marker({
+                position: new google.maps.LatLng(0, 0),
+                title:"",
+                icon: rstimg
+            })
+    }
+
+    var thingMarker = function() {
+        return new google.maps.Marker({
+                position: new google.maps.LatLng(0, 0),
+                title:"",
+                icon: ttdimg
+            })
+    }
+                
 
     //initializing trip days
     function tripObj(){
         this.hotel = null;
         this.rest = [];
         this.thing = [];
+        //markers
+        this.hotelMark = new google.maps.Marker({
+            position: new google.maps.LatLng(0, 0),
+            title:"",
+            icon: htlimg
+        });
+        this.restMark = [];
+        this.thingMark = []
+    }
+    var possObj = {
+        hotelMark: new google.maps.Marker({
+            position: new google.maps.LatLng(0, 0),
+            title:"",
+            icon: htlimg
+        }),
+        restMark: restMarker(),
+        thingMark: thingMarker()
     }
     var dayArray = [new tripObj()]
+
+
+    function initializeEmptyMarker() {
+
+    }
 
     function findActiveDay() {
         var d = $('#active-day').text();
@@ -77,11 +121,36 @@ $(document).ready(function() {
             var elem = $('#day-'+day).find(".hotelForDay");
             elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
             dayArray[day-1].hotel = hName;
-            all_hotels.forEach(function(hotel) {
-                if(hotel.name === hName) console.log(hotel.place[0].location)
-            })
+
+            var lat;
+            var lon;
+            all_hotels.forEach(function(hotelObject){
+                if(hotelObject.name === hName){
+                    lat = hotelObject.place[0].location[0]
+                    lon = hotelObject.place[0].location[1]
+                }
+            });            
+
+            //clear possible hotelmarker
+            possObj.hotelMark.setMap(null);
+
+            //set selected hotel marker
+            dayArray[day-1].hotelMark.position = new google.maps.LatLng(lat,lon);
+            dayArray[day-1].hotelMark.title = hName;
+            console.log(dayArray[day-1].hotelMark)
+            dayArray[day-1].hotelMark.setMap(map);
+            $("#possHotel option").filter(function() {
+                return $(this).text() == "--"
+            }).attr('selected', true);
+
         } else {
+            possObj.hotelMark.setMap(null);
             alert('You already booked a Hotel');
+            $("#possHotel option").filter(function() {
+                return $(this).text() == "--"
+            }).attr('selected', true);
+
+
         }
     })
 
@@ -94,11 +163,35 @@ $(document).ready(function() {
                 var elem = $('#day-'+day).find(".restForDay");
                 elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
                 dayArray[day-1].rest.push(hName); 
+                var lat;
+                var lon;
+                all_restaurants.forEach(function(restaurantObject){
+                    if(restaurantObject.name === hName){
+                        lat = restaurantObject.place[0].location[0]
+                        lon = restaurantObject.place[0].location[1]
+                    }
+                });            
+
+                //clear possible hotelmarker
+                possObj.restMark.setMap(null);
+                var newMark = restMarker();
+                newMark.position = new google.maps.LatLng(lat,lon);
+                newMark.title = hName;
+                newMark.setMap(map);
+                dayArray[day-1].restMark.push(newMark);
+                //resets select
+                $("#possRest option").filter(function() {
+                    return $(this).text() == "--"
+                }).attr('selected', true);
             }else{
                 alert(hName+' is good, but not that good!')
             }
         } else {
+            possObj.restMark.setMap(null);
             alert('You\'ve booked three restaurants!');
+            $("#possRest option").filter(function() {
+                return $(this).text() == "--"
+            }).attr('selected', true);
         }
     })
 
@@ -112,17 +205,43 @@ $(document).ready(function() {
                 var elem = $('#day-'+day).find(".thingsForDay");
                 elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
                 dayArray[day-1].thing.push(hName);
+
+                var lat;
+                var lon;
+                all_things_to_do.forEach(function(thingObject){
+                    if(thingObject.name === hName){
+                        lat = thingObject.place[0].location[0]
+                        lon = thingObject.place[0].location[1]
+                    }
+                });            
+
+                //clear possible hotelmarker
+                possObj.thingMark.setMap(null);
+                var newMark = thingMarker();
+                newMark.position = new google.maps.LatLng(lat,lon);
+                newMark.title = hName;
+                newMark.setMap(map);
+                dayArray[day-1].thingMark.push(newMark);
+                //resets select
+                $("#possThing option").filter(function() {
+                    return $(this).text() == "--"
+                }).attr('selected', true);
             }else{
                 alert('You\'re boring!');
             }
         } else {
+            possObj.thingMark.setMap(null);
             alert('You already have four things to do today!');
+            $("#possThing option").filter(function() {
+                return $(this).text() == "--"
+            }).attr('selected', true);
         }
     })
     $('#addDay').click(function(){
         if(dayArray.length < 7){
             createADay();
             var day = findActiveDay();
+            $('#day-number').text(dayArray.length);
 
             //create the new day button
             var newbtn = $(this).before('<button id="newbtn" class="btn btn-circle day-clicker">'+dayArray.length+'</button>');
@@ -145,9 +264,8 @@ $(document).ready(function() {
 
             //add id active day to the active new day button
             $('#newbtn').attr('id', 'active-day');
-
+            $('#remove-day').css('display','inline-block');
         }
-
     })
 
     $('#the-day').on('click', '.removeItem', function() {
@@ -162,6 +280,7 @@ $(document).ready(function() {
         id = parseInt(id.slice(-1));
         if($(this).parent().parent('ul').hasClass('hotelForDay')) {
             dayArray[id-1].hotel = null;
+            dayArray[id-1].hotelMark.setMap(null);
         } else if ($(this).parent().parent('ul').hasClass('restForDay')) {
             var index;
             dayArray[id-1].rest.forEach(function(restaurant) {
@@ -170,7 +289,8 @@ $(document).ready(function() {
                 }
             })
             dayArray[id-1].rest.splice(index, 1);
-            console.log(dayArray)
+            dayArray[id-1].restMark[index].setMap(null);
+            dayArray[id-1].restMark.splice(index, 1);
         } else if ($(this).parent().parent('ul').hasClass('thingsForDay')) {
             var index;
             dayArray[id-1].thing.forEach(function(thing) {
@@ -179,7 +299,8 @@ $(document).ready(function() {
                 }
             })
             dayArray[id-1].thing.splice(index, 1);
-            console.log(dayArray)
+            dayArray[id-1].thingMark[index].setMap(null);
+            dayArray[id-1].thingMark.splice(index, 1);
         }
         // remove item from DOM
         $(this).parent().remove()
@@ -187,7 +308,12 @@ $(document).ready(function() {
 
     $('#list-days').delegate(".day-clicker", "click", function() {
         //use this to get the day to change to
-        var day = $(this).text();
+        var day = parseInt($(this).text());
+        if(day < dayArray.length) {
+            $('#remove-day').css('display','none');
+        } else if(day === dayArray.length) {
+            $('#remove-day').css('display','inline-block');
+        }
 
         //use findActive day to hide the days html
         var actDay = findActiveDay();
@@ -197,7 +323,84 @@ $(document).ready(function() {
         $('#day-'+day).css('display', 'block');
         $('#active-day').removeAttr("id");
         $(this).attr("id", "active-day");
+        $('#day-number').text(day);
     })
+
+    $('#remove-day').click(function(){
+        //store the number
+
+
+        //change day number
+        if(dayArray.length > 1){
+            $('#day-number').text(parseInt($('#day-number').text())-1);
+        }
+        //select previous day active button
+        // $('').click()
+        $('#active-day').prev().attr('id','active-day');
+        //remove day button
+        $("#active-day").next().remove();
+        //remove the day html
+        $('#day-'+dayArray.length).remove();
+        //remove from dayArray
+        dayArray.pop();
+        //display previous day html
+        $('#day-'+dayArray.length).css('display','block')
+        //are we at day 1?  if so, remove 'remove day ' button
+        if(dayArray.length === 1){
+
+            $('#remove-day').css('display','none');
+        }
+    })
+
+
+    //function to handle select changes, to create markers and expand map
+    //if you select an item, it will show up on the map.  if you add it, the select marker should disappear.  
+    //if you've completed your final item it should disable select markers
+
+    $("#possHotel").change(function(){
+        var hotName = $(this).val()
+        var lat;
+        var lon;
+        all_hotels.forEach(function(hotelObject){
+            if(hotelObject.name === hotName){
+                lat = hotelObject.place[0].location[0]
+                lon = hotelObject.place[0].location[1]
+            }
+        });
+        possObj.hotelMark.position = new google.maps.LatLng(lat, lon);
+        possObj.hotelMark.title= hotName;
+        possObj.hotelMark.setMap(map);
+
+    })
+    $("#possRest").change(function(){
+        var restName = $(this).val()
+        var lat;
+        var lon;
+        all_restaurants.forEach(function(restaurantObject){
+            if(restaurantObject.name === restName){
+                lat = restaurantObject.place[0].location[0]
+                lon = restaurantObject.place[0].location[1]
+            }
+        });
+        possObj.restMark.position = new google.maps.LatLng(lat, lon);
+        possObj.restMark.title = restName;
+        possObj.restMark.setMap(map);
+    })
+    $("#possThing").change(function(){
+        var thingName = $(this).val()
+        var lat;
+        var lon;
+        all_things_to_do.forEach(function(thingObject){
+            if(thingObject.name === thingName){
+                lat = thingObject.place[0].location[0]
+                lon = thingObject.place[0].location[1]
+            }
+        });  
+        possObj.thingMark.position = new google.maps.LatLng(lat, lon);
+        possObj.thingMark.title = thingName;
+        possObj.thingMark.setMap(map);
+    })
+
 });
 
 

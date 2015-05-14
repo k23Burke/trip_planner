@@ -66,7 +66,7 @@ router.get('/', function(req, res, next) {
 		restaurants: function(done) {
 			models.Restaurant.find(done)
 		},
-		things: function(done) {
+		things_to_do: function(done) {
 			models.ThingToDo.find(done)
 		}
 	},function(err, resultsHash) {
