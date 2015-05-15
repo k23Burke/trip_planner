@@ -67,6 +67,19 @@ a {
 
 	}
 }
+
+#eyeSelect{
+	height: 30px;
+	width: 300px;
+	position: absolute;
+	z-index: 2;
+	top: 92%;
+	left: 2%;
+	h2{
+	   vertical-align: middle;
+	   display: inline;
+	}
+}
 #remove-day{
 	display:none;
 }

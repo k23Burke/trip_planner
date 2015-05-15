@@ -57,6 +57,17 @@ a {
     #day-selector #the-day li {
       list-style: none; }
 
+#eyeSelect {
+  height: 30px;
+  width: 300px;
+  position: absolute;
+  z-index: 2;
+  top: 92%;
+  left: 2%; }
+  #eyeSelect h2 {
+    vertical-align: middle;
+    display: inline; }
+
 #remove-day {
   display: none; }
 

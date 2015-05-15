@@ -1,3 +1,11 @@
+
+
+
+
+
+
+
+///////////////////////////////////
 function initialize_gmaps() {
     // initialize new google maps LatLng object
     var myLatlng = new google.maps.LatLng(40.7223552,-73.974415);
@@ -12,33 +20,6 @@ function initialize_gmaps() {
     // initialize a new Google Map with the options
     var map = new google.maps.Map(map_canvas_obj, mapOptions);
     return map;
-    // Add the marker to the map
-    // var htlimg = 'http://static.iconsplace.com/icons/preview/black/hotel-32.png';
-    // var rstimg = 'http://static.iconsplace.com/icons/preview/black/restaurant-32.png';
-    // var ttdimg = 'http://static.iconsplace.com/icons/preview/black/museum-32.png';
-
-    // var hLatLng = new google.maps.LatLng(40.707119, -74.003602);
-    // var hmarker = new google.maps.Marker({
-    //     position: hLatLng,
-    //     title:"Hotel",
-    //     icon: htlimg
-    // });
-    // var rLatLng = new google.maps.LatLng(40.71919, -74.003602);
-    // var rmarker = new google.maps.Marker({
-    //     position: rLatLng,
-    //     title:"Restaurant",
-    //     icon: rstimg
-    // });
-    // var tLatLng = new google.maps.LatLng(40.718679, -74.008900);
-    // var tmarker = new google.maps.Marker({
-    //     position: tLatLng,
-    //     title:"Things",
-    //     icon: ttdimg
-    // });
-    // // Add the marker to the map by calling setMap()
-    // hmarker.setMap(map);
-    // rmarker.setMap(map);
-    // tmarker.setMap(map);
 }
 
 
@@ -48,6 +29,10 @@ function initialize_gmaps() {
 
 $(document).ready(function() {
     var map = initialize_gmaps();
+
+    // var TripView =  Backbone.View.extend();
+    // var tripViewInstance = new TripView();
+    // console.log(tripViewInstance.el);
 
     var htlimg = 'http://static.iconsplace.com/icons/preview/black/hotel-32.png';
     var rstimg = 'http://static.iconsplace.com/icons/preview/black/restaurant-32.png';
@@ -151,6 +136,7 @@ $(document).ready(function() {
         var day = findActiveDay();
         var hName = $('#possHotel').val();
         if(dayArray[day-1].hotel === null && hName !== "") {
+            console.log('HERE');
             var hName = $('#possHotel').val();
             var elem = $('#day-'+day).find(".hotelForDay");
             elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
@@ -179,8 +165,13 @@ $(document).ready(function() {
             }).attr('selected', true);
 
         } else {
+            debugger;
             possObj.hotelMark.setMap(null);
-            alert('You already booked a Hotel');
+            if(hName !== "") {
+                alert('Make your selection');
+            } else {
+                alert('You already booked a Hotel');
+            }
             $("#possHotel option").filter(function() {
                 return $(this).text() == "--"
             }).attr('selected', true);
@@ -226,7 +217,11 @@ $(document).ready(function() {
             }
         } else {
             possObj.restMark.setMap(null);
-            alert('You\'ve booked three restaurants!');
+            if(hName !== "") {
+                alert('Make your selection');
+            } else {
+                alert('You\'ve booked three restaurants!');
+            }
             $("#possRest option").filter(function() {
                 return $(this).text() == "--"
             }).attr('selected', true);
@@ -271,7 +266,11 @@ $(document).ready(function() {
             }
         } else {
             possObj.thingMark.setMap(null);
-            alert('You already have four things to do today!');
+            if(hName !== "") {
+                alert('Make your selection');
+            } else {
+                alert('You already have four things to do today!');
+            }
             $("#possThing option").filter(function() {
                 return $(this).text() == "--"
             }).attr('selected', true);
@@ -368,6 +367,9 @@ $(document).ready(function() {
         $('#active-day').removeAttr("id");
         $(this).attr("id", "active-day");
         $('#day-number').text(day);
+        if(dayArray.length === 1){
+            $('#remove-day').css('display','none');
+        }
     })
 
     $('#remove-day').click(function(){
@@ -386,6 +388,15 @@ $(document).ready(function() {
         //remove the day html
         $('#day-'+dayArray.length).remove();
         //remove from dayArray
+        var index = dayArray.length - 1;
+        // dayArray[index].hotelMark.setMap(null);
+        dayArray[index].hotelMark.setMap(null);
+        dayArray[index].restMark.forEach(function(restMarker) {
+            restMarker.setMap(null)
+        })
+        dayArray[index].thingMark.forEach(function(thingMarker) {
+            thingMarker.setMap(null)
+        })
         dayArray.pop();
         //display previous day html
         $('#day-'+dayArray.length).css('display','block')
@@ -394,6 +405,7 @@ $(document).ready(function() {
 
             $('#remove-day').css('display','none');
         }
+        removeAllMarkersExceptDay(dayArray.length);
     })
 
 
@@ -403,53 +415,77 @@ $(document).ready(function() {
 
     $("#possHotel").change(function(){
         var hotName = $(this).val()
-        var lat;
-        var lon;
-        all_hotels.forEach(function(hotelObject){
-            if(hotelObject.name === hotName){
-                lat = hotelObject.place[0].location[0]
-                lon = hotelObject.place[0].location[1]
-            }
-        });
-        possObj.hotelMark.position = new google.maps.LatLng(lat, lon);
-        newBounds(possObj.hotelMark.position);
-        possObj.hotelMark.title= hotName;
-        possObj.hotelMark.setMap(map);
-
+        if(hotName !== "") {
+            var lat;
+            var lon;
+            all_hotels.forEach(function(hotelObject){
+                if(hotelObject.name === hotName){
+                    lat = hotelObject.place[0].location[0]
+                    lon = hotelObject.place[0].location[1]
+                }
+            });
+            possObj.hotelMark.position = new google.maps.LatLng(lat, lon);
+            newBounds(possObj.hotelMark.position);
+            possObj.hotelMark.title= hotName;
+            possObj.hotelMark.setMap(map);
+        } else {
+            possObj.hotelMark.setMap(null);
+        }
     })
     $("#possRest").change(function(){
         var restName = $(this).val()
-        var lat;
-        var lon;
-        all_restaurants.forEach(function(restaurantObject){
-            if(restaurantObject.name === restName){
-                lat = restaurantObject.place[0].location[0]
-                lon = restaurantObject.place[0].location[1]
-            }
-        });
-        possObj.restMark.position = new google.maps.LatLng(lat, lon);
-        newBounds(possObj.restMark.position);
-        possObj.restMark.title = restName;
-        possObj.restMark.setMap(map);
+        if(restName !== "") {
+            var lat;
+            var lon;
+            all_restaurants.forEach(function(restaurantObject){
+                if(restaurantObject.name === restName){
+                    lat = restaurantObject.place[0].location[0]
+                    lon = restaurantObject.place[0].location[1]
+                }
+            });
+            possObj.restMark.position = new google.maps.LatLng(lat, lon);
+            newBounds(possObj.restMark.position);
+            possObj.restMark.title = restName;
+            possObj.restMark.setMap(map);
+        } else {
+            possObj.restMark.setMap(null);
+        }
     })
     $("#possThing").change(function(){
         var thingName = $(this).val()
-        var lat;
-        var lon;
-        all_things_to_do.forEach(function(thingObject){
-            if(thingObject.name === thingName){
-                lat = thingObject.place[0].location[0]
-                lon = thingObject.place[0].location[1]
-            }
-        });  
-        possObj.thingMark.position = new google.maps.LatLng(lat, lon);
-        newBounds(possObj.thingMark.position);
-        possObj.thingMark.title = thingName;
-        possObj.thingMark.setMap(map);
+        if(thingName !== "") {
+            var lat;
+            var lon;
+            all_things_to_do.forEach(function(thingObject){
+                if(thingObject.name === thingName){
+                    lat = thingObject.place[0].location[0]
+                    lon = thingObject.place[0].location[1]
+                }
+            });  
+            possObj.thingMark.position = new google.maps.LatLng(lat, lon);
+            newBounds(possObj.thingMark.position);
+            possObj.thingMark.title = thingName;
+            possObj.thingMark.setMap(map);
+        } else {
+            possObj.thingMark.setMap(null);
+        }
     })
+
+
+$("#eyeSelect").click(function(){
+       $("#sidebar").fadeToggle()
+       $("#sidebar-ontop").fadeToggle()
+   })
+
+
+//BACKBONE STUFF
+    var tripViewInstance = new TripView();
 
 });
 
+//if -- is set when you submit pop an alert
+
+// day deleted show icons on previous day
 
 
 
