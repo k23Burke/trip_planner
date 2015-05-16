@@ -59,8 +59,16 @@
   <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
   <script src="/bower_components/underscore/underscore.js"></script>
   <script src="/bower_components/backbone/backbone.js"></script>
+  <script src="/javascripts/day.model.js"></script>
+  <script src="/javascripts/day.collection.js"></script>
   <script src="/javascripts/trip.view.js"></script>
+  <script src="/javascripts/dayButton.view.js"></script>
+  <script src="/javascripts/dayItinerary.view.js"></script>
   <script src="/javascripts/main.js"></script>
+  <script type="text/template" id="itinerary_template">
+    <div id="day-<%=dayNum%>">
+    <h3>Hotel</h3><ul class="hotelForDay"></ul><h3>Restaurant</h3><ul class="restForDay"></ul><h3>Things to Do</h3><ul class="thingsForDay"></ul></div>
+  </script>
 
 
 </html>

@@ -76,6 +76,18 @@ $(document).ready(function() {
                 day.thingMark.forEach(function(thingMarker) {
                     thingMarker.setMap(null)
                 })
+                possObj.thingMark.setMap(null);
+                possObj.hotelMark.setMap(null);
+                possObj.restMark.setMap(null);
+                $("#possHotel option").filter(function() {
+                   return $(this).text() == "--"
+                }).attr('selected', true);
+                $("#possRest option").filter(function() {
+                   return $(this).text() == "--"
+                }).attr('selected', true);
+                $("#possThing option").filter(function() {
+                   return $(this).text() == "--"  
+                }).attr('selected', true);
             } else {
                 day.hotelMark.setMap(map);
                 day.restMark.forEach(function(restMarker) {
@@ -276,38 +288,38 @@ $(document).ready(function() {
             }).attr('selected', true);
         }
     })
-    $('#addDay').click(function(){
-        if(dayArray.length < 7){
-            removePossMarkers();
-            createADay();
-            var day = findActiveDay();
-            removeAllMarkersExceptDay(dayArray.length)
-            $('#day-number').text(dayArray.length);
+    // $('#addDay').click(function(){
+    //     if(dayArray.length < 7){
+    //         removePossMarkers();
+    //         createADay();
+    //         var day = findActiveDay();
+    //         removeAllMarkersExceptDay(dayArray.length)
+    //         $('#day-number').text(dayArray.length);
 
-            //create the new day button
-            var newbtn = $(this).before('<button id="newbtn" class="btn btn-circle day-clicker">'+dayArray.length+'</button>');
-            $('#day-'+day).css('display', 'none');
-            //remove id active day
-            $('#active-day').removeAttr('id');
-            //create the newday html
-            var html = '<div id="day-'+dayArray.length+'">';
-            html +='<h3>Hotel</h3>';
-            html += '<ul class="hotelForDay">';
-            html += '</ul>';
-            html += '<h3>Restaurant</h3>';
-            html += '<ul class="restForDay">';
-            html += '</ul>';
-            html += '<h3>Things to Do</h3>';
-            html += '<ul class="thingsForDay">';
-            html += '</ul>';
-            html += '</div>';
-            $('#the-day').append(html);
+    //         //create the new day button
+    //         var newbtn = $(this).before('<button id="newbtn" class="btn btn-circle day-clicker">'+dayArray.length+'</button>');
+    //         $('#day-'+day).css('display', 'none');
+    //         //remove id active day
+    //         $('#active-day').removeAttr('id');
+    //         //create the newday html
+    //         var html = '<div id="day-'+dayArray.length+'">';
+    //         html +='<h3>Hotel</h3>';
+    //         html += '<ul class="hotelForDay">';
+    //         html += '</ul>';
+    //         html += '<h3>Restaurant</h3>';
+    //         html += '<ul class="restForDay">';
+    //         html += '</ul>';
+    //         html += '<h3>Things to Do</h3>';
+    //         html += '<ul class="thingsForDay">';
+    //         html += '</ul>';
+    //         html += '</div>';
+    //         $('#the-day').append(html);
 
-            //add id active day to the active new day button
-            $('#newbtn').attr('id', 'active-day');
-            $('#remove-day').css('display','inline-block');
-        }
-    })
+    //         //add id active day to the active new day button
+    //         $('#newbtn').attr('id', 'active-day');
+    //         $('#remove-day').css('display','inline-block');
+    //     }
+    // })
 
     $('#the-day').on('click', '.removeItem', function() {
         removePossMarkers();
@@ -348,29 +360,29 @@ $(document).ready(function() {
         $(this).parent().remove()
     });
 
-    $('#list-days').delegate(".day-clicker", "click", function() {
-        //use this to get the day to change to
-        var day = parseInt($(this).text());
-        removeAllMarkersExceptDay(day)
-        if(day < dayArray.length) {
-            $('#remove-day').css('display','none');
-        } else if(day === dayArray.length) {
-            $('#remove-day').css('display','inline-block');
-        }
+    // $('#list-days').delegate(".day-clicker", "click", function() {
+    //     //use this to get the day to change to
+    //     var day = parseInt($(this).text());
+    //     removeAllMarkersExceptDay(day)
+    //     if(day < dayArray.length) {
+    //         $('#remove-day').css('display','none');
+    //     } else if(day === dayArray.length) {
+    //         $('#remove-day').css('display','inline-block');
+    //     }
 
-        //use findActive day to hide the days html
-        var actDay = findActiveDay();
-        $('#day-'+actDay).css('display', 'none');
+    //     //use findActive day to hide the days html
+    //     var actDay = findActiveDay();
+    //     $('#day-'+actDay).css('display', 'none');
 
-        //show day of clicked button
-        $('#day-'+day).css('display', 'block');
-        $('#active-day').removeAttr("id");
-        $(this).attr("id", "active-day");
-        $('#day-number').text(day);
-        if(dayArray.length === 1){
-            $('#remove-day').css('display','none');
-        }
-    })
+    //     //show day of clicked button
+    //     $('#day-'+day).css('display', 'block');
+    //     $('#active-day').removeAttr("id");
+    //     $(this).attr("id", "active-day");
+    //     $('#day-number').text(day);
+    //     if(dayArray.length === 1){
+    //         $('#remove-day').css('display','none');
+    //     }
+    // })
 
     $('#remove-day').click(function(){
         //store the number
@@ -472,20 +484,40 @@ $(document).ready(function() {
     })
 
 
-$("#eyeSelect").click(function(){
-       $("#sidebar").fadeToggle()
-       $("#sidebar-ontop").fadeToggle()
-   })
+    $("#eyeSelect").click(function(){
+           $("#sidebar").fadeToggle()
+           $("#sidebar-ontop").fadeToggle()
+    })
 
 
 //BACKBONE STUFF
-    var tripViewInstance = new TripView();
+
+
 
 });
+var app = {
+    dayInstance: new Day(),
+    temp_days: new DaysCollection(),
+    tripViewInstance: null
+}
+app.tripViewInstance = new TripView();
+// console.log(app.temp_days);
 
-//if -- is set when you submit pop an alert
 
-// day deleted show icons on previous day
+// TripView.initialize = function(){
+//       console.log(app.temp_days);  
+
+//       this.listenTo(app.temp_days, 'add', this.createDayBtn);
+// }
+
+// TripView.initialize();
+
+// TripView.createDayBtn = function() {
+//   //<yuck>
+//       this.$el.find('#list-days').append('<button class="btn btn-default btn-primary">Day ' + app.temp_days.length + '</button>');
+//   //</yuck>
+// }
+
 
 
 
