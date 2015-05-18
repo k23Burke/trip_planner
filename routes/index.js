@@ -73,7 +73,6 @@ router.get('/', function(req, res, next) {
 		// console.log(resultsHash.hotels[0].place);
 		// var place = JSON.parse(resultsHash.hotels[0].place);
 		// console.log(place.location)\
-		console.log(resultsHash.hotels[0]);
 		res.render('index', resultsHash)
 	})
 });

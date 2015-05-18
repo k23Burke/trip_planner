@@ -35,21 +35,9 @@
     <div id="day-selector" class="panel panel-default">
       <h1>Day <span id="day-number">1</span><button id="remove-day" class="btn btn-circle">x</button></h1>
       <div id="list-days" class="panel-heading">
-        <button id="active-day" class="btn btn-circle day-clicker">1</button>
         <button id="addDay" class="btn btn-circle">+</button>
       </div>
       <div id="the-day" class="panel-body">
-        <div id="day-1">
-          <h3>Hotel</h3>
-          <ul class="hotelForDay">
-          </ul>
-          <h3>Restaurant</h3>
-          <ul class="restForDay">
-          </ul>
-          <h3>Things to Do</h3>
-          <ul class="thingsForDay">
-          </ul>
-        </div>
       </div>
     </div>
   </div>
@@ -59,11 +47,11 @@
   <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
   <script src="/bower_components/underscore/underscore.js"></script>
   <script src="/bower_components/backbone/backbone.js"></script>
-  <script src="/javascripts/day.model.js"></script>
-  <script src="/javascripts/day.collection.js"></script>
-  <script src="/javascripts/trip.view.js"></script>
-  <script src="/javascripts/dayButton.view.js"></script>
-  <script src="/javascripts/dayItinerary.view.js"></script>
+  <!-- <script src="/javascripts/day.model.js"></script>
+  // <script src="/javascripts/day.collection.js"></script>
+  // <script src="/javascripts/trip.view.js"></script>
+  // <script src="/javascripts/dayButton.view.js"></script>
+  // <script src="/javascripts/dayItinerary.view.js"></script> -->
   <script src="/javascripts/main.js"></script>
   <script type="text/template" id="itinerary_template">
     <div id="day-<%=dayNum%>">

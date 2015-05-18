@@ -10,7 +10,7 @@
 	  		<select name="hotel" id="possHotel">
 	  				<option value="">--</option>
 	    		{% for hotel in hotels %}
-		    		<option value="{{ hotel.name }}">{{ hotel.name }}</option>
+		    		<option value="{{ hotel.id }}">{{ hotel.name }}</option>
 	    		{% endfor %}
 	  		</select>
 	  		<button id="hotelSelector" class="btn btn-circle">+</button>
@@ -23,7 +23,7 @@
 	  		<select name="restaurant" id= "possRest">
 	  				<option value="">--</option>
 	    		{% for restaurant in restaurants %}
-		    		<option value="{{ restaurant.name }}">{{ restaurant.name }}</option>
+		    		<option value="{{ restaurant.id }}">{{ restaurant.name }}</option>
 	    		{% endfor %}
 	  		</select>
 	  		<button id="restaurantSelector" class="btn btn-circle">+</button>
@@ -35,7 +35,7 @@
 	  		<select name="thing" id="possThing">
 	  				<option value="">--</option>
 	    		{% for thing in things_to_do %}
-		    		<option value="{{ thing.name }}">{{ thing.name }}</option>
+		    		<option value="{{ thing.id }}">{{ thing.name }}</option>
 	    		{% endfor %}
 	  		</select>
 	  		<button id="thingSelector" class="btn btn-circle">+</button>

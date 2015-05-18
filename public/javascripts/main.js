@@ -30,6 +30,61 @@ function initialize_gmaps() {
 $(document).ready(function() {
     var map = initialize_gmaps();
 
+    //initalize firstDay
+    $.ajax({
+        type: 'GET',
+        url: '/days/check',
+        data:'',
+        success: function(days) {
+            console.log(days);
+            var html = '';
+            var btnhtml ='<button id="active-day" class="btn btn-circle day-clicker">1</button>';
+            days.forEach(function(day) {
+                if(days.indexOf(day) !== 0) {
+                    html +='<div id="day-'+day.number+'" style="display:none;">';
+                    btnhtml += '<button class="btn btn-circle day-clicker">'+day.number+'</button>';
+                } else {
+                    html +='<div id="day-'+day.number+'">';
+                }
+                html += '<h3>Hotel</h3><ul class="hotelForDay">';
+                if(day.hotel) {
+                    console.log(day.hotel);
+                    all_hotels.forEach(function(hotelObject){
+                        console.log(hotelObject);
+                        if(hotelObject._id === day.hotel){
+                            html += '<li>'+hotelObject.name+'<button class="removeItem btn btn-circle">x</button></li>';
+                        }
+                    });  
+                }
+                html += '</ul><h3>Restaurant</h3><ul class="restForDay">'
+                if(day.restaurant.length > 0) {
+                    day.restaurant.forEach(function(restaurant) {
+                        all_restaurants.forEach(function(restaurantObject){
+                            if(restaurantObject._id === restaurant){
+                                html += '<li>'+restaurantObject.name+'<button class="removeItem btn btn-circle">x</button></li>';
+                                
+                            }
+                        });  
+                    })
+                }
+                html+= '</ul><h3>Things to Do</h3><ul class="thingsForDay">'
+
+                if(day.thingToDo.length > 0) {
+                    day.thingToDo.forEach(function(thingtodo) {
+                        all_things_to_do.forEach(function(thingstodoObject) {
+                            if(thingstodoObject._id === thingtodo) {
+                                html+= '<li>'+thingstodoObject.name+'<button class="removeItem btn btn-circle">x</button></li>'
+                            }
+                        })
+                    })
+                }
+                html +='</ul></div>';
+            })
+            $('#the-day').append(html);
+            $('#addDay').before(btnhtml);
+        }
+    })
+
     // var TripView =  Backbone.View.extend();
     // var tripViewInstance = new TripView();
     // console.log(tripViewInstance.el);
@@ -136,7 +191,7 @@ $(document).ready(function() {
     }
     function createADay(){
         dayArray.push(new tripObj());
-        console.log(dayArray)
+        // console.log(dayArray)
     }
 
     var h = $(window).height();
@@ -146,56 +201,69 @@ $(document).ready(function() {
 
     $('#hotelSelector').click(function(){
         var day = findActiveDay();
-        var hName = $('#possHotel').val();
-        if(dayArray[day-1].hotel === null && hName !== "") {
-            console.log('HERE');
-            var hName = $('#possHotel').val();
+        var hName = $('#possHotel option:selected').text();
+        var hId = $('#possHotel').val();
+        // if(dayArray[day-1].hotel === null && hName !== "--") {
+            var hName = $('#possHotel option:selected').text();
             var elem = $('#day-'+day).find(".hotelForDay");
             elem.append('<li>'+hName+'<button class="removeItem btn btn-circle">x</button></li>');
-            dayArray[day-1].hotel = hName;
+            // dayArray[day-1].hotel = hName;
 
-            var lat;
-            var lon;
-            all_hotels.forEach(function(hotelObject){
-                if(hotelObject.name === hName){
-                    lat = hotelObject.place[0].location[0]
-                    lon = hotelObject.place[0].location[1]
+            //make AJAX request to add hotel to day
+            $.ajax({
+                type:'POST',
+                url: '/days/addhotel',
+                data: 'day='+day+'&hotel='+hId,
+                success: function(response) {
+                    //perform something with response
+
+                    console.log(response);
                 }
-            });            
+            })
+
+            console.log('day='+day+'&hotel='+hId);
+
+            // var lat;
+            // var lon;
+            // all_hotels.forEach(function(hotelObject){
+            //     if(hotelObject.name === hName){
+            //         lat = hotelObject.place[0].location[0]
+            //         lon = hotelObject.place[0].location[1]
+            //     }
+            // });            
 
             //clear possible hotelmarker
-            possObj.hotelMark.setMap(null);
+            // possObj.hotelMark.setMap(null);
 
             //set selected hotel marker
-            dayArray[day-1].hotelMark.position = new google.maps.LatLng(lat,lon);
-            newBounds(dayArray[day-1].hotelMark.position);
-            dayArray[day-1].hotelMark.title = hName;
-            console.log(dayArray[day-1].hotelMark)
-            dayArray[day-1].hotelMark.setMap(map);
+            // dayArray[day-1].hotelMark.position = new google.maps.LatLng(lat,lon);
+            // newBounds(dayArray[day-1].hotelMark.position);
+            // dayArray[day-1].hotelMark.title = hName;
+            // console.log(dayArray[day-1].hotelMark)
+            // dayArray[day-1].hotelMark.setMap(map);
             $("#possHotel option").filter(function() {
                 return $(this).text() == "--"
             }).attr('selected', true);
 
-        } else {
-            debugger;
-            possObj.hotelMark.setMap(null);
-            if(hName !== "") {
-                alert('Make your selection');
-            } else {
-                alert('You already booked a Hotel');
-            }
-            $("#possHotel option").filter(function() {
-                return $(this).text() == "--"
-            }).attr('selected', true);
+        // } else {
+        //     possObj.hotelMark.setMap(null);
+        //     if(hName !== "--") {
+        //         alert('Make your selection');
+        //     } else {
+        //         alert('You already booked a Hotel');
+        //     }
+        //     $("#possHotel option").filter(function() {
+        //         return $(this).text() == "--"
+        //     }).attr('selected', true);
 
 
-        }
+        // }
     })
 
     $('#restaurantSelector').click(function(){
         var day = findActiveDay();
-        var hName = $('#possRest').val();
-        if(dayArray[day-1].rest.length < 3 && hName !== "") {
+        var hName = $('#possRest  option:selected').text();
+        if(dayArray[day-1].rest.length < 3 && hName !== "--") {
             
             
             if(dayArray[day-1].rest.indexOf(hName) === -1 ){
@@ -209,7 +277,21 @@ $(document).ready(function() {
                         lat = restaurantObject.place[0].location[0]
                         lon = restaurantObject.place[0].location[1]
                     }
-                });            
+                });
+
+                var rId = $('#possRest  option:selected').val();
+
+
+                $.ajax({
+                    type:'POST',
+                    url: '/days/addrestaurant',
+                    data: 'day='+day+'&restaurant='+rId,
+                    success: function(response) {
+                        //perform something with response
+
+                        console.log(response);
+                    }
+                })
 
                 //clear possible hotelmarker
                 possObj.restMark.setMap(null);
@@ -229,7 +311,7 @@ $(document).ready(function() {
             }
         } else {
             possObj.restMark.setMap(null);
-            if(hName !== "") {
+            if(hName !== "--") {
                 alert('Make your selection');
             } else {
                 alert('You\'ve booked three restaurants!');
@@ -242,8 +324,8 @@ $(document).ready(function() {
 
     $('#thingSelector').click(function(){
         var day = findActiveDay();
-        var hName = $('#possThing').val();
-        if(dayArray[day-1].thing.length < 4 && hName !== "") {
+        var hName = $('#possThing  option:selected').text();
+        if(dayArray[day-1].thing.length < 4 && hName !== "--") {
             
             
             if(dayArray[day-1].thing.indexOf(hName) === -1 ){
@@ -259,7 +341,20 @@ $(document).ready(function() {
                         lat = thingObject.place[0].location[0]
                         lon = thingObject.place[0].location[1]
                     }
-                });            
+                });       
+
+                var tId =  $('#possThing  option:selected').val();
+
+                $.ajax({
+                    type:'POST',
+                    url: '/days/addthing',
+                    data: 'day='+day+'&thing='+tId,
+                    success: function(response) {
+                        //perform something with response
+
+                        console.log(response);
+                    }
+                })     
 
                 //clear possible hotelmarker
                 possObj.thingMark.setMap(null);
@@ -278,7 +373,7 @@ $(document).ready(function() {
             }
         } else {
             possObj.thingMark.setMap(null);
-            if(hName !== "") {
+            if(hName !== "--") {
                 alert('Make your selection');
             } else {
                 alert('You already have four things to do today!');
@@ -288,38 +383,49 @@ $(document).ready(function() {
             }).attr('selected', true);
         }
     })
-    // $('#addDay').click(function(){
-    //     if(dayArray.length < 7){
-    //         removePossMarkers();
-    //         createADay();
-    //         var day = findActiveDay();
-    //         removeAllMarkersExceptDay(dayArray.length)
-    //         $('#day-number').text(dayArray.length);
+    $('#addDay').click(function(){
+        //create day in db
+        var daynum;
+        $.ajax({
+            type: 'GET',
+            url: '/days/addday',
+            success:function(newday){
+                console.log(newday);
+                daynum = newday.number;
+                console.log(daynum);
+                var oldDay = findActiveDay();
 
-    //         //create the new day button
-    //         var newbtn = $(this).before('<button id="newbtn" class="btn btn-circle day-clicker">'+dayArray.length+'</button>');
-    //         $('#day-'+day).css('display', 'none');
-    //         //remove id active day
-    //         $('#active-day').removeAttr('id');
-    //         //create the newday html
-    //         var html = '<div id="day-'+dayArray.length+'">';
-    //         html +='<h3>Hotel</h3>';
-    //         html += '<ul class="hotelForDay">';
-    //         html += '</ul>';
-    //         html += '<h3>Restaurant</h3>';
-    //         html += '<ul class="restForDay">';
-    //         html += '</ul>';
-    //         html += '<h3>Things to Do</h3>';
-    //         html += '<ul class="thingsForDay">';
-    //         html += '</ul>';
-    //         html += '</div>';
-    //         $('#the-day').append(html);
+                //hide oldDay markers on map
+                removeAllMarkersExceptDay(daynum)
+                removePossMarkers();
 
-    //         //add id active day to the active new day button
-    //         $('#newbtn').attr('id', 'active-day');
-    //         $('#remove-day').css('display','inline-block');
-    //     }
-    // })
+                //hide oldDay html
+                $('#day-'+oldDay).css('display', 'none');
+                $('#active-day').removeAttr('id');
+
+                //display newday html
+                var html = '<div id="day-'+daynum+'">';
+                html +='<h3>Hotel</h3>';
+                html += '<ul class="hotelForDay">';
+                html += '</ul>';
+                html += '<h3>Restaurant</h3>';
+                html += '<ul class="restForDay">';
+                html += '</ul>';
+                html += '<h3>Things to Do</h3>';
+                html += '<ul class="thingsForDay">';
+                html += '</ul>';
+                html += '</div>';
+                $('#the-day').append(html);
+                $('#day-number').text(daynum);
+                //create new button day
+                var newbtn = $('#addDay').before('<button id="newbtn" class="btn btn-circle day-clicker">'+daynum+'</button>');
+                // console.log('HERE');
+                $('#newbtn').attr('id', 'active-day');
+                // console.log('THERE');
+                $('#remove-day').css('display','inline-block');
+            }
+        });
+    })
 
     $('#the-day').on('click', '.removeItem', function() {
         removePossMarkers();
@@ -330,59 +436,105 @@ $(document).ready(function() {
         //get dayid
         // $('#day-1').parent();
         var id = $(this).parent().parent().parent('div').attr('id');
-        console.log(id);
+        //console.log(id);
         id = parseInt(id.slice(-1));
+        var dayToRemove = $('#active-day').text();
         if($(this).parent().parent('ul').hasClass('hotelForDay')) {
             dayArray[id-1].hotel = null;
             dayArray[id-1].hotelMark.setMap(null);
+
+
+            //ajax to remove hotel from db
+            $.ajax({
+                type: 'POST',
+                url: 'days/removehotel',
+                data: 'dayToRemove=' + dayToRemove,
+                success: function(data){
+                    //console.log(data);
+                }
+            })
+
+
         } else if ($(this).parent().parent('ul').hasClass('restForDay')) {
             var index;
-            dayArray[id-1].rest.forEach(function(restaurant) {
-                if(value === restaurant) {
-                    index = dayArray[id-1].rest.indexOf(restaurant);
+            var rId;
+
+            all_restaurants.forEach(function(restaurantObject){
+                if(restaurantObject.name === value){
+                    rId = restaurantObject._id;
+                }
+            });  
+
+            //ajax to remove hotel from db
+            $.ajax({
+                type: 'POST',
+                url: 'days/removerestaurant',
+                data: 'dayToRemove=' + dayToRemove + '&rId='+rId,
+                success: function(data){
+                    console.log(data);
                 }
             })
-            dayArray[id-1].rest.splice(index, 1);
-            dayArray[id-1].restMark[index].setMap(null);
-            dayArray[id-1].restMark.splice(index, 1);
+            // dayArray[id-1].rest.forEach(function(restaurant) {
+            //     if(value === restaurant) {
+            //         index = dayArray[id-1].rest.indexOf(restaurant);
+            //     }
+            // })
+            // dayArray[id-1].rest.splice(index, 1);
+            // dayArray[id-1].restMark[index].setMap(null);
+            // dayArray[id-1].restMark.splice(index, 1);
         } else if ($(this).parent().parent('ul').hasClass('thingsForDay')) {
             var index;
-            dayArray[id-1].thing.forEach(function(thing) {
-                if(value === thing) {
-                    index = dayArray[id-1].thing.indexOf(thing);
+
+            all_things_to_do.forEach(function(thingObject){
+                if(thingObject.name === value){
+                    tId = thingObject._id;
                 }
-            })
-            dayArray[id-1].thing.splice(index, 1);
-            dayArray[id-1].thingMark[index].setMap(null);
-            dayArray[id-1].thingMark.splice(index, 1);
+            }); 
+            //ajax to remove hotel from db
+            $.ajax({
+                type: 'POST',
+                url: 'days/removething',
+                data: 'dayToRemove=' + dayToRemove + '&tId='+tId,
+                success: function(data){
+                    console.log(data);
+                }
+            }) 
+            // dayArray[id-1].thing.forEach(function(thing) {
+            //     if(value === thing) {
+            //         index = dayArray[id-1].thing.indexOf(thing);
+            //     }
+            // })
+            // dayArray[id-1].thing.splice(index, 1);
+            // dayArray[id-1].thingMark[index].setMap(null);
+            // dayArray[id-1].thingMark.splice(index, 1);
         }
         // remove item from DOM
         $(this).parent().remove()
     });
 
-    // $('#list-days').delegate(".day-clicker", "click", function() {
-    //     //use this to get the day to change to
-    //     var day = parseInt($(this).text());
-    //     removeAllMarkersExceptDay(day)
-    //     if(day < dayArray.length) {
-    //         $('#remove-day').css('display','none');
-    //     } else if(day === dayArray.length) {
-    //         $('#remove-day').css('display','inline-block');
-    //     }
+    $('#list-days').delegate(".day-clicker", "click", function() {
+        //use this to get the day to change to
+        var day = parseInt($(this).text());
+        removeAllMarkersExceptDay(day)
+        if(day < dayArray.length) {
+            $('#remove-day').css('display','none');
+        } else if(day === dayArray.length) {
+            $('#remove-day').css('display','inline-block');
+        }
 
-    //     //use findActive day to hide the days html
-    //     var actDay = findActiveDay();
-    //     $('#day-'+actDay).css('display', 'none');
+        //use findActive day to hide the days html
+        var actDay = findActiveDay();
+        $('#day-'+actDay).css('display', 'none');
 
-    //     //show day of clicked button
-    //     $('#day-'+day).css('display', 'block');
-    //     $('#active-day').removeAttr("id");
-    //     $(this).attr("id", "active-day");
-    //     $('#day-number').text(day);
-    //     if(dayArray.length === 1){
-    //         $('#remove-day').css('display','none');
-    //     }
-    // })
+        //show day of clicked button
+        $('#day-'+day).css('display', 'block');
+        $('#active-day').removeAttr("id");
+        $(this).attr("id", "active-day");
+        $('#day-number').text(day);
+        if(dayArray.length === 1){
+            $('#remove-day').css('display','none');
+        }
+    })
 
     $('#remove-day').click(function(){
         //store the number
@@ -426,8 +578,8 @@ $(document).ready(function() {
     //if you've completed your final item it should disable select markers
 
     $("#possHotel").change(function(){
-        var hotName = $(this).val()
-        if(hotName !== "") {
+        var hotName = $('#possHotel option:selected').text()
+        if(hotName !== "--") {
             var lat;
             var lon;
             all_hotels.forEach(function(hotelObject){
@@ -445,7 +597,8 @@ $(document).ready(function() {
         }
     })
     $("#possRest").change(function(){
-        var restName = $(this).val()
+        // var restName = $(this).val()
+        var restName = $('#possRest option:selected').text()
         if(restName !== "") {
             var lat;
             var lon;
@@ -464,7 +617,8 @@ $(document).ready(function() {
         }
     })
     $("#possThing").change(function(){
-        var thingName = $(this).val()
+        // var thingName = $(this).val()
+        var thingName = $('#possThing option:selected').text()
         if(thingName !== "") {
             var lat;
             var lon;
@@ -495,12 +649,12 @@ $(document).ready(function() {
 
 
 });
-var app = {
-    dayInstance: new Day(),
-    temp_days: new DaysCollection(),
-    tripViewInstance: null
-}
-app.tripViewInstance = new TripView();
+// var app = {
+//     dayInstance: new Day(),
+//     temp_days: new DaysCollection(),
+//     tripViewInstance: null
+// }
+// app.tripViewInstance = new TripView();
 // console.log(app.temp_days);
 
 
@@ -517,6 +671,36 @@ app.tripViewInstance = new TripView();
 //       this.$el.find('#list-days').append('<button class="btn btn-default btn-primary">Day ' + app.temp_days.length + '</button>');
 //   //</yuck>
 // }
+
+// function printer(str) {
+//     console.log(str);
+// }
+
+// AJAXmaker('GET', '/days', '', printer);
+
+
+
+// function AJAXmaker(verb, url, data, cb) {
+//     $.ajax({
+//         type: verb,
+//         url: url,
+//         data: data,
+//         succes: function(response) {
+//             console.log('response', response)
+//         }
+//     });
+// }
+
+
+//adding day
+
+//adding hotel to day
+
+//adding restaurant to array for day
+
+//adding thingstodo to array for day
+
+//remove day
 
 
 

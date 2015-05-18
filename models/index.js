@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/wikistack');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongodb connection error:'));
 
-var Place, Hotel, ThingToDo, Restaurant;
+var Place, Hotel, ThingToDo, Restaurant, Day;
 var Schema = mongoose.Schema;
 
 //build schemas
@@ -38,16 +38,25 @@ var RestaurantSchema =  new Schema({
 	price: {type: Number, min:1, max:5}// (integer from 1-5 for how many dollar signs)
 })
 
+var DaySchema = new Schema({
+	number: Number,
+	hotel: {type: mongoose.Schema.Types.ObjectId, ref: 'Hotel'},
+	restaurant: [{type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant'}],
+	thingToDo: [{type: mongoose.Schema.Types.ObjectId, ref: 'ThingToDo'}]
+})
+
 
 Place = mongoose.model('Place', PlaceSchema);
 Hotel = mongoose.model('Hotel', HotelSchema);
 ThingToDo = mongoose.model('ThingToDo', ThingToDoSchema);
 Restaurant = mongoose.model('Restaurant', RestaurantSchema);
+Day = mongoose.model('Day', DaySchema);
 
 //exports
 module.exports = {
 	Place: Place,
 	Hotel: Hotel,
 	ThingToDo: ThingToDo,
-	Restaurant: Restaurant
+	Restaurant: Restaurant,
+	Day: Day
 }
